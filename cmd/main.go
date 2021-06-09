@@ -14,7 +14,7 @@ type NetSpace struct {
 	Success   bool    `json:"success"`
 	DayChange float64 `json:"daychange"`
 	Netspace  int64   `json:"netspace"`
-	Timestamp string  `json:"timestamp"`
+	Timestamp int     `json:"timestamp"`
 }
 type Market struct {
 	Success   bool    `json:"success"`
@@ -22,7 +22,7 @@ type Market struct {
 	Daymin    float64 `json:"daymin"`
 	Daymax    float64 `json:"daymax"`
 	Daychange float64 `json:"daychange"`
-	Timestamp string  `json:"timestamp"`
+	Timestamp int     `json:"timestamp"`
 }
 type XCH struct {
 	Netspace  string
@@ -46,8 +46,10 @@ func main() {
 	xchURL := "https://api.chiaprofitability.com/market"
 
 	getJson(netspaceURL, ns)
-	fmt.Println(ns.Netspace)
-	fmt.Println(ns.DayChange)
+	fmt.Printf("Success is: %v\n", ns.Success)
+	fmt.Printf("Netspace is: %d\n", ns.Netspace)
+	fmt.Printf("Daychange is: %f\n", ns.DayChange)
+	fmt.Printf("Timestamp is: %d\n", ns.Timestamp)
 
 	getJson(xchURL, market)
 	fmt.Println(market.Price)
@@ -58,8 +60,8 @@ func main() {
 	xch.Netspace = fmt.Sprintf("%d", ns.Netspace)
 	xch.Price = fmt.Sprintf("%f", market.Price)
 
-	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
-	postXCH(robotURL, xch)
+	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
+	//postXCH(robotURL, xch)
 }
 
 func getJson(url string, target interface{}) error {
