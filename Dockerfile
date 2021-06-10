@@ -1,6 +1,6 @@
 FROM golang:latest AS buildStage
 WORKDIR /root/xchrobot
-ADD . /root/xchrobot/
+ADD . /root/xchrobot
 RUN cd /root/xchrobot/cmd && go build -o main
 
 FROM alpine:latest
