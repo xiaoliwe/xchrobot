@@ -11,10 +11,10 @@ import (
 )
 
 type NetSpace struct {
-	Success   bool    `json:"success"`
-	DayChange float64 `json:"daychange"`
-	Netspace  int64   `json:"netspace"`
-	Timestamp int     `json:"timestamp"`
+	Success   bool        `json:"success"`
+	DayChange float64     `json:"daychange"`
+	Netspace  json.Number `json:"netspace"`
+	Timestamp int64       `json:"timestamp"`
 }
 type Market struct {
 	Success   bool    `json:"success"`
@@ -22,7 +22,7 @@ type Market struct {
 	Daymin    float64 `json:"daymin"`
 	Daymax    float64 `json:"daymax"`
 	Daychange float64 `json:"daychange"`
-	Timestamp int     `json:"timestamp"`
+	Timestamp int64   `json:"timestamp"`
 }
 type XCH struct {
 	Netspace  string
@@ -46,19 +46,28 @@ func main() {
 	xchURL := "https://api.chiaprofitability.com/market"
 
 	getJson(netspaceURL, ns)
-	fmt.Printf("Success is: %v\n", ns.Success)
-	fmt.Printf("Netspace is: %d\n", ns.Netspace)
-	fmt.Printf("Daychange is: %f\n", ns.DayChange)
-	fmt.Printf("Timestamp is: %d\n", ns.Timestamp)
-
 	getJson(xchURL, market)
-	fmt.Println(market.Price)
+
+	f, _ := ns.Netspace.Float64()
+	eb := f / 1152921504606846976
+
+	AllPower := fmt.Sprint(eb)[0:5]
+	XCHPrice := fmt.Sprint(market.Price)[0:6]
+	Updatetime := time.Unix(ns.Timestamp, 0)
+	NewPower := fmt.Sprint(((ns.DayChange / 100.00) * eb) * 1024)[0:6]
+
+	fmt.Printf("Success is: %v\n", ns.Success)
+	fmt.Printf("Netspace(EiB) is: %v\n", AllPower)
+	fmt.Printf("Daychange is: %v\n", ns.DayChange)
+	fmt.Printf("NewChange(PiB) is: %v\n", NewPower)
+	fmt.Printf("Timestamp is: %v\n", Updatetime)
+	fmt.Printf("XCH Price(USD): %s", XCHPrice)
 
 	//Post
 	xch := new(XCH)
-	xch.Daychange = fmt.Sprintf("%f", ns.DayChange)
-	xch.Netspace = fmt.Sprintf("%d", ns.Netspace)
-	xch.Price = fmt.Sprintf("%f", market.Price)
+	xch.Daychange = fmt.Sprintf("%v", NewPower)
+	xch.Netspace = fmt.Sprintf("%v", ns.Netspace)
+	xch.Price = fmt.Sprintf("%v", market.Price)
 
 	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
 	//postXCH(robotURL, xch)
