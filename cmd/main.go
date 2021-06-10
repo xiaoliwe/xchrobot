@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 type NetSpace struct {
@@ -39,6 +41,15 @@ type Notify struct {
 var httpClient = &http.Client{Timeout: 10 * time.Second}
 
 func main() {
+	crontab := cron.New()
+	task := func() { handlerPost() }
+	spec := "0 0 8,20 * * ?"
+	crontab.AddFunc(spec, task)
+	crontab.Start()
+
+	select {}
+}
+func handlerPost() {
 	ns := new(NetSpace)
 	market := new(Market)
 
@@ -71,6 +82,7 @@ func main() {
 
 	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
 	postXCH(robotURL, xch)
+	fmt.Println("Push XCHPrice Success!")
 }
 
 func getJson(url string, target interface{}) error {
