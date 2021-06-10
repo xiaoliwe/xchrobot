@@ -1,5 +1,5 @@
 FROM golang:latest
-WORKDIR /xchrobot
-ADD . /xchrobot/
-RUN cd /xchrobot/cmd && go build -o main
-CMD ["/xchrobot/cmd/main"]
+WORKDIR /root/xchrobot
+ADD . /root/xchrobot/
+RUN cd /root/xchrobot/cmd && go build -o main
+CMD ["/root/xchrobot/cmd/main"]
