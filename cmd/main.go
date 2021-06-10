@@ -66,11 +66,11 @@ func main() {
 	//Post
 	xch := new(XCH)
 	xch.Daychange = fmt.Sprintf("%v", NewPower)
-	xch.Netspace = fmt.Sprintf("%v", ns.Netspace)
-	xch.Price = fmt.Sprintf("%v", market.Price)
+	xch.Netspace = fmt.Sprintf("%v", AllPower)
+	xch.Price = fmt.Sprintf("%v", XCHPrice)
 
-	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
-	//postXCH(robotURL, xch)
+	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
+	postXCH(robotURL, xch)
 }
 
 func getJson(url string, target interface{}) error {
