@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/robfig/cron"
 )
 
 type NetSpace struct {
@@ -79,8 +81,8 @@ func handlerPost() {
 	xch.Netspace = fmt.Sprintf("%v", AllPower)
 	xch.Price = fmt.Sprintf("%v", XCHPrice)
 
-	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
-	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
+	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
+	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
 	postXCH(robotURL, xch)
 	fmt.Println("Push XCHPrice Success!")
 }
@@ -97,7 +99,7 @@ func getJson(url string, target interface{}) error {
 
 func postXCH(url string, xchInfo *XCH) string {
 
-	contents := fmt.Sprintf("今日币价简报:\n >全网算力: <font color=\"info\">%s EiB</font>\n>新增算力: <font color=\"comment\">%s PiB</font>\n>当前币价: <font color=\"warning\">%s USD</font>\n耕种收益:<font color=\"warning\"> 0.0004 XCH/TiB</font>",
+	contents := fmt.Sprintf("今日币价简报:\n >全网算力: <font color=\"info\">%s EiB</font>\n>新增算力: <font color=\"comment\">%s PiB</font>\n>当前币价: <font color=\"warning\">%s USD</font>\n耕种收益:<font color=\"warning\"> 0.0003 XCH/TiB</font>",
 		xchInfo.Netspace, xchInfo.Daychange, xchInfo.Price)
 
 	notify := new(Notify)
