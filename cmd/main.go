@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/robfig/cron/v3"
 )
 
 type NetSpace struct {
@@ -43,11 +41,11 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 func main() {
 	crontab := cron.New()
 	task := func() { handlerPost() }
-	spec := "0 0 19 * * ?"
+	spec := "0 19 * * *"
 	crontab.AddFunc(spec, task)
-	crontab.Start()
 
-	select {}
+	go crontab.Start()
+	defer crontab.Stop()
 }
 func handlerPost() {
 	ns := new(NetSpace)
