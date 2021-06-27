@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 type NetSpace struct {
@@ -41,11 +43,11 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 func main() {
 	crontab := cron.New()
 	task := func() { handlerPost() }
-	spec := "0 19 * * *"
+	//spec := "0 19 * * *"
+	spec := "5 * * * *"
 	crontab.AddFunc(spec, task)
-
-	go crontab.Start()
-	defer crontab.Stop()
+	crontab.Start()
+	crontab.Stop()
 }
 func handlerPost() {
 	ns := new(NetSpace)
@@ -78,8 +80,8 @@ func handlerPost() {
 	xch.Netspace = fmt.Sprintf("%v", AllPower)
 	xch.Price = fmt.Sprintf("%v", XCHPrice)
 
-	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
-	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
+	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084"
+	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
 	postXCH(robotURL, xch)
 	fmt.Println("Push XCHPrice Success!")
 }
