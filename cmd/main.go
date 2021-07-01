@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -41,13 +42,16 @@ type Notify struct {
 var httpClient = &http.Client{Timeout: 10 * time.Second}
 
 func main() {
-	crontab := cron.New()
+	crontab := cron.New(cron.WithLogger(cron.VerbosePrintfLogger(log.New(os.Stdout, "cron:", log.LstdFlags))))
 	_, err := crontab.AddFunc("CRON_TZ=Asia/Shanghai 0 19 * * *", func() { handlerPost() })
 	if err != nil {
 		log.Printf("main-->cron error:%s", err)
 		return
 	}
 	crontab.Start()
+	defer crontab.Stop()
+
+	select {}
 	//handlerPost()
 }
 func handlerPost() {
@@ -87,8 +91,8 @@ func handlerPost() {
 	xch.Netspace = fmt.Sprintf("%v", AllPower)
 	xch.Price = fmt.Sprintf("%v", XCHPrice)
 
-	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084" //Garden
-	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
+	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084" //Garden
+	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
 	postXCH(robotURL, xch)
 	fmt.Println("Push XCHPrice Success!")
 }
