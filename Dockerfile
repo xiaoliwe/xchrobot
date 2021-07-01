@@ -1,9 +1,8 @@
-FROM golang:latest AS buildStage
-WORKDIR /root/xchrobot
-ADD . /root/xchrobot
-RUN cd /root/xchrobot/cmd && go build -o main
-
 FROM alpine:latest
-WORKDIR /app
-COPY --from=buildStage /root/xchrobot/cmd/main /app/
-ENTRYPOINT ./main
+LABEL maintainer="dev@winecos.com"
+ENV WORKDIR /opt/xchrobot/cmd
+ADD ./main $WORKDIR/main
+RUN chmod +x $WORKDIR/main
+EXPOSE 8080
+WORKDIR $WORKDIR
+CMD ./main

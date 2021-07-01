@@ -44,6 +44,7 @@ func main() {
 	crontab := cron.New()
 	_, err := crontab.AddFunc("CRON_TZ=Asia/Shanghai 0 19 * * *", func() { handlerPost() })
 	if err != nil {
+		log.Printf("main-->cron error:%s", err)
 		return
 	}
 	crontab.Start()
