@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/robfig/cron/v3"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/robfig/cron/v3"
 )
 
 type NetSpace struct {
@@ -43,22 +42,21 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 func main() {
 	crontab := cron.New()
 	task := func() { handlerPost() }
-	spec := "0 19 * * *"
-	//spec := "5 * * * *"
+	spec := "CRON_TZ=Asia/Shanghai 0 19 * * *"
 	crontab.AddFunc(spec, task)
 	crontab.Start()
 
-	time.Sleep((12 * time.Hour))
+	time.Sleep(12 * time.Hour)
 	//handlerPost()
 }
 func handlerPost() {
 	ns := new(NetSpace)
 	market := new(Market)
 
-	netspaceURL := "https://api.chiaprofitability.com/netspace"
+	namespaceURL := "https://api.chiaprofitability.com/netspace"
 	xchURL := "https://api.chiaprofitability.com/market"
 
-	getJson(netspaceURL, ns)
+	getJson(namespaceURL, ns)
 	getJson(xchURL, market)
 
 	f, _ := ns.Netspace.Float64()
