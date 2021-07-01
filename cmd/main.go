@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/robfig/cron/v3"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -41,7 +42,10 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 
 func main() {
 	crontab := cron.New()
-	crontab.AddFunc("CRON_TZ=Asia/Shanghai 0 19 * * *", func() { handlerPost() })
+	_, err := crontab.AddFunc("CRON_TZ=Asia/Shanghai 0 19 * * *", func() { handlerPost() })
+	if err != nil {
+		return
+	}
 	crontab.Start()
 	//handlerPost()
 }
@@ -52,8 +56,14 @@ func handlerPost() {
 	namespaceURL := "https://api.chiaprofitability.com/netspace"
 	xchURL := "https://api.chiaprofitability.com/market"
 
-	getJson(namespaceURL, ns)
-	getJson(xchURL, market)
+	err := getJson(namespaceURL, ns)
+	if err != nil {
+		return
+	}
+	err2 := getJson(xchURL, market)
+	if err2 != nil {
+		return
+	}
 
 	f, _ := ns.Netspace.Float64()
 	eb := f / 1152921504606846976
@@ -76,8 +86,8 @@ func handlerPost() {
 	xch.Netspace = fmt.Sprintf("%v", AllPower)
 	xch.Price = fmt.Sprintf("%v", XCHPrice)
 
-	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084" //Garden
-	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
+	//robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=68d83069-cde9-493f-9081-34537f132084" //Garden
+	robotURL := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3e46f7e1-8c0a-4cd8-acbb-4c8a312ac7e5"
 	postXCH(robotURL, xch)
 	fmt.Println("Push XCHPrice Success!")
 }
@@ -87,7 +97,12 @@ func getJson(url string, target interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(r.Body)
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
@@ -109,7 +124,12 @@ func postXCH(url string, xchInfo *XCH) string {
 	if err != nil {
 		log.Fatalf("Post failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(resp.Body)
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
